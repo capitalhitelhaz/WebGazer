@@ -1,4 +1,4 @@
-(function(window, undefined) {
+export const initWebgazer = window => {
     console.log('initializing webgazer');
     //strict mode for type safety
     'use strict';
@@ -26,7 +26,7 @@
     webgazer.params.faceOverlayId = 'webgazerFaceOverlay';
     webgazer.params.faceFeedbackBoxId = 'webgazerFaceFeedbackBox';
     webgazer.params.gazeDotId = 'webgazerGazeDot'
-    
+
     webgazer.params.videoViewerWidth = 320;
     webgazer.params.videoViewerHeight = 240;
 
@@ -102,7 +102,7 @@
      * @returns {Object} The dimensions of the validation box as top, left, width, height.
      */
     webgazer.computeValidationBoxSize = function() {
-        
+
         var vw = videoElement.videoWidth;
         var vh = videoElement.videoHeight;
         var pw = parseInt(videoElement.style.width);
@@ -110,18 +110,18 @@
 
         // Find the size of the box.
         // Pick the smaller of the two video preview sizes
-        smaller = Math.min( vw, vh );
-        larger  = Math.max( vw, vh );
+        var smaller = Math.min( vw, vh );
+        var larger  = Math.max( vw, vh );
 
         // Overall scalar
-        scalar = ( vw == larger ? pw / vw : ph / vh );
+        var scalar = ( vw == larger ? pw / vw : ph / vh );
 
         // Multiply this by 2/3, then adjust it to the size of the preview
-        boxSize = (smaller * webgazer.params.faceFeedbackBoxRatio) * scalar;
+        var boxSize = (smaller * webgazer.params.faceFeedbackBoxRatio) * scalar;
 
         // Set the boundaries of the face overlay validation box based on the preview
-        topVal = (ph - boxSize)/2;
-        leftVal = (pw - boxSize)/2;
+        var topVal = (ph - boxSize)/2;
+        var leftVal = (pw - boxSize)/2;
 
         // top, left, width, height
         return [topVal, leftVal, boxSize, boxSize]
@@ -136,12 +136,12 @@
         if (faceFeedbackBox != null && latestEyeFeatures) {
             var w = videoElement.videoWidth;
             var h = videoElement.videoHeight;
-            
+
             // Find the size of the box.
             // Pick the smaller of the two video preview sizes
             var smaller = Math.min( w, h );
             var boxSize = smaller * webgazer.params.faceFeedbackBoxRatio;
-        
+
             // Set the boundaries of the face overlay validation box based on the preview
             var topBound = (h - boxSize)/2;
             var leftBound = (w - boxSize)/2;
@@ -154,10 +154,10 @@
    			var eyeRX = latestEyeFeatures.right.imagex;
    			var eyeRY = latestEyeFeatures.right.imagey;
 
-            
+
             var xPositions = false;
             var yPositions = false;
-            
+
             //check if the x values for the left and right eye are within the
             //validation box
             if (eyeLX > leftBound && eyeLX < rightBound) {
@@ -291,7 +291,7 @@
             // [20180729 JT] Why do we need to do this? clmTracker does this itself _already_, which is just duplicating the work.
             // Is it because other trackers need a canvas instead of an img/video element?
             paintCurrentFrame(videoElementCanvas, videoElementCanvas.width, videoElementCanvas.height);
-            
+
             // Get gaze prediction (ask clm to track; pass the data to the regressor; get back a prediction)
             latestGazeData = getPrediction();
             // Count time
@@ -461,7 +461,7 @@
 
         videoElement = document.createElement('video');
         videoElement.id = webgazer.params.videoElementId;
-        videoElement.srcObject = videoStream; 
+        videoElement.srcObject = videoStream;
         videoElement.autoplay = true;
         videoElement.style.display = webgazer.params.showVideo ? 'block' : 'none';
         videoElement.style.position = 'fixed';
@@ -471,7 +471,7 @@
         videoElement.style.width = webgazer.params.videoViewerWidth + 'px';
         videoElement.style.height = webgazer.params.videoViewerHeight + 'px';
         //videoElement.style.zIndex="-1";
-        
+
         // Canvas for drawing video to pass to clm tracker
         videoElementCanvas = document.createElement('canvas');
         videoElementCanvas.id = webgazer.params.videoElementCanvasId;
@@ -493,8 +493,8 @@
         faceFeedbackBox.style.display = webgazer.params.showFaceFeedbackBox ? 'block' : 'none';
         faceFeedbackBox.style.position = 'fixed';
         faceFeedbackBox.style.border = 'solid';
-               
-        // Gaze dot 
+
+        // Gaze dot
         // Starts offscreen
         gazeDot = document.createElement('div');
         gazeDot.id = webgazer.params.gazeDotId;
@@ -513,7 +513,7 @@
         // Add other preview/feedback elements to the screen once the video has shown and its parameters are initialized
         document.body.appendChild(videoElement);
         function setupPreviewVideo(e) {
-            
+
             // All video preview parts have now been added, so set the size both internally and in the preview window.
             setInternalVideoBufferSizes( videoElement.videoWidth, videoElement.videoHeight );
             webgazer.setVideoViewerSize( webgazer.params.videoViewerWidth, webgazer.params.videoViewerHeight );
@@ -528,7 +528,7 @@
         };
         videoElement.addEventListener('timeupdate', setupPreviewVideo);
 
-        
+
         addMouseEventListeners();
 
         //BEGIN CALLBACK LOOP
@@ -677,7 +677,7 @@
 
       // Removes the box around the face
       document.body.removeChild( faceFeedbackBox );
-      
+
       return webgazer;
     }
 
@@ -700,7 +700,7 @@
 
     /**
      * Set whether the video preview is visible or not.
-     * @param {*} bool 
+     * @param {*} bool
      * @return {webgazer} this
      */
     webgazer.showVideo = function(val) {
@@ -713,7 +713,7 @@
 
     /**
      * Set whether the face overlay is visible or not.
-     * @param {*} bool 
+     * @param {*} bool
      * @return {webgazer} this
      */
     webgazer.showFaceOverlay = function(val) {
@@ -726,11 +726,11 @@
 
     /**
      * Set whether the face feedback box is visible or not.
-     * @param {*} bool 
+     * @param {*} bool
      * @return {webgazer} this
      */
     webgazer.showFaceFeedbackBox = function(val) {
-        
+
         webgazer.params.showFaceFeedbackBox = val;
         if( faceFeedbackBox ) {
             faceFeedbackBox.style.display = val ? 'block' : 'none';
@@ -753,13 +753,13 @@
     /**
      * Define constraints on the video camera that is used. Useful for non-standard setups.
      * This can be set before calling webgazer.begin(), but also mid stream.
-     * 
+     *
      * @param {Object} constraints Example constraints object:
      * { width: { min: 320, ideal: 1280, max: 1920 }, height: { min: 240, ideal: 720, max: 1080 }, facingMode: "user" };
-     * 
+     *
      * Follows definition here:
      * https://developer.mozilla.org/en-US/docs/Web/API/Media_Streams_API/Constraints
-     * 
+     *
      * Note: The constraints set here are applied to the video track only. They also _replace_ any constraints, so be sure to set everything you need.
      * Warning: Setting a large video resolution will decrease performance, and may require
      */
@@ -772,7 +772,7 @@
             webgazer.pause();
             videoTrack = videoStream.getVideoTracks()[0];
             videoTrack.applyConstraints( webgazer.params.camConstraints ).then(function() {
-                
+
                 // Now get what was actually set, and update the internal buffer values
                 videoSettings = videoTrack.getSettings();
                 setInternalVideoBufferSizes( videoSettings.width, videoSettings.height );
@@ -780,7 +780,7 @@
             }).catch(function(err) { // error handling
                 console.log( err );
             }).finally(function() {
-                // Reset and recompute sizes of the video viewer. 
+                // Reset and recompute sizes of the video viewer.
                 // This is only to adjust the feedback box, say, if the aspect ratio of the video has changed.
                 webgazer.setVideoViewerSize( webgazer.params.videoViewerWidth, webgazer.params.videoViewerHeight )
                 webgazer.getTracker().reset();
@@ -791,8 +791,8 @@
 
     /**
      * Does what it says on the tin.
-     * @param {*} width 
-     * @param {*} height 
+     * @param {*} width
+     * @param {*} height
      */
     function setInternalVideoBufferSizes( width, height ) {
         // Re-set the canvas size used by the internal processes
@@ -830,7 +830,7 @@
         // Change the video viewer
         videoElement.style.width = w + 'px';
         videoElement.style.height = h + 'px';
-        
+
         // Change the face overlay
         faceOverlay.style.width = w + 'px';
         faceOverlay.style.height = h + 'px';
@@ -1023,7 +1023,7 @@
     webgazer.getVideoElementCanvas = function() {
         return videoElementCanvas;
     }
-  
+
     /**
      * Set the video element canvas; useful if you want to run WebGazer on your own canvas (e.g., on any random image).
      * @return The current video element canvas
@@ -1036,4 +1036,4 @@
         return [webgazer.params.videoViewerWidth / videoElement.videoWidth, webgazer.params.videoViewerHeight / videoElement.videoHeight];
     }
 
-}(window));
+}; //(window));

@@ -71,4 +71,4 @@ var mosseFilterResponses = function() {
 
     return response
   }
-}
+}.bind(window)
