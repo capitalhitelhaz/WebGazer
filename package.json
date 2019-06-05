@@ -1,6 +1,6 @@
 {
     "name": "@capitalhitelhaz/webgazer",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "repository": {
         "type": "git",
         "url": "https://github.com/capitalhitelhaz/WebGazer.git"
@@ -13,5 +13,5 @@
         "grunt-contrib-uglify-es": "git://github.com/gruntjs/grunt-contrib-uglify.git#harmony",
         "jsdoc": "^3.5.5"
     },
-    "main": "./www/webgazer.js"
+    "main": "./build/webgazer.js"
 }

@@ -39,7 +39,7 @@ export const initWebgazer = window => {
     webgazer.params.showGazeDot = false;
 
     //Params to clmtrackr and getUserMedia constraints
-    webgazer.params.clmParams = webgazer.params.clmParams || {useWebGL : true};
+    webgazer.params.clmParams = webgazer.params.clmParams || { useWebGL: true };
     webgazer.params.camConstraints = webgazer.params.camConstraints || { video: { width: { min: 320, ideal: 640, max: 1920 }, height: { min: 240, ideal: 480, max: 1080 }, facingMode: "user" } };
 
     webgazer.params.smoothEyeBB = webgazer.params.smoothEyeBB || false;
@@ -55,7 +55,7 @@ export const initWebgazer = window => {
     var latestGazeData = null;
     var paused = false;
     //registered callback for loop
-    var nopCallback = function(data, time) {};
+    var nopCallback = function (data, time) { };
     var callback = nopCallback;
 
     //Types that regression systems should handle
@@ -73,15 +73,15 @@ export const initWebgazer = window => {
 
     //lookup tables
     var curTrackerMap = {
-        'clmtrackr': function() { return new webgazer.tracker.ClmGaze(); },
-        'trackingjs': function() { return new webgazer.tracker.TrackingjsGaze(); },
-        'js_objectdetect': function() { return new webgazer.tracker.Js_objectdetectGaze(); }
+        'clmtrackr': function () { return new webgazer.tracker.ClmGaze(); },
+        'trackingjs': function () { return new webgazer.tracker.TrackingjsGaze(); },
+        'js_objectdetect': function () { return new webgazer.tracker.Js_objectdetectGaze(); }
     };
     var regressionMap = {
-        'ridge': function() { return new webgazer.reg.RidgeReg(); },
-        'weightedRidge': function() { return new webgazer.reg.RidgeWeightedReg(); },
-        'threadedRidge': function() { return new webgazer.reg.RidgeRegThreaded(); },
-        'linear': function() { return new webgazer.reg.LinearReg(); }
+        'ridge': function () { return new webgazer.reg.RidgeReg(); },
+        'weightedRidge': function () { return new webgazer.reg.RidgeWeightedReg(); },
+        'threadedRidge': function () { return new webgazer.reg.RidgeRegThreaded(); },
+        'linear': function () { return new webgazer.reg.LinearReg(); }
     };
 
     //localstorage name
@@ -101,7 +101,7 @@ export const initWebgazer = window => {
      * Computes the size of the face overlay validation box depending on the size of the video preview window.
      * @returns {Object} The dimensions of the validation box as top, left, width, height.
      */
-    webgazer.computeValidationBoxSize = function() {
+    webgazer.computeValidationBoxSize = function () {
 
         var vw = videoElement.videoWidth;
         var vh = videoElement.videoHeight;
@@ -110,18 +110,18 @@ export const initWebgazer = window => {
 
         // Find the size of the box.
         // Pick the smaller of the two video preview sizes
-        var smaller = Math.min( vw, vh );
-        var larger  = Math.max( vw, vh );
+        var smaller = Math.min(vw, vh);
+        var larger = Math.max(vw, vh);
 
         // Overall scalar
-        var scalar = ( vw == larger ? pw / vw : ph / vh );
+        var scalar = (vw == larger ? pw / vw : ph / vh);
 
         // Multiply this by 2/3, then adjust it to the size of the preview
         var boxSize = (smaller * webgazer.params.faceFeedbackBoxRatio) * scalar;
 
         // Set the boundaries of the face overlay validation box based on the preview
-        var topVal = (ph - boxSize)/2;
-        var leftVal = (pw - boxSize)/2;
+        var topVal = (ph - boxSize) / 2;
+        var leftVal = (pw - boxSize) / 2;
 
         // top, left, width, height
         return [topVal, leftVal, boxSize, boxSize]
@@ -139,20 +139,20 @@ export const initWebgazer = window => {
 
             // Find the size of the box.
             // Pick the smaller of the two video preview sizes
-            var smaller = Math.min( w, h );
+            var smaller = Math.min(w, h);
             var boxSize = smaller * webgazer.params.faceFeedbackBoxRatio;
 
             // Set the boundaries of the face overlay validation box based on the preview
-            var topBound = (h - boxSize)/2;
-            var leftBound = (w - boxSize)/2;
+            var topBound = (h - boxSize) / 2;
+            var leftBound = (w - boxSize) / 2;
             var rightBound = leftBound + boxSize;
             var bottomBound = topBound + boxSize;
 
             //get the x and y positions of the left and right eyes
-   			var eyeLX = latestEyeFeatures.left.imagex;
-			var eyeLY = latestEyeFeatures.left.imagey;
-   			var eyeRX = latestEyeFeatures.right.imagex;
-   			var eyeRY = latestEyeFeatures.right.imagey;
+            var eyeLX = latestEyeFeatures.left.imagex;
+            var eyeLY = latestEyeFeatures.left.imagey;
+            var eyeRX = latestEyeFeatures.right.imagex;
+            var eyeRY = latestEyeFeatures.right.imagey;
 
 
             var xPositions = false;
@@ -161,9 +161,9 @@ export const initWebgazer = window => {
             //check if the x values for the left and right eye are within the
             //validation box
             if (eyeLX > leftBound && eyeLX < rightBound) {
-               if (eyeRX > leftBound && eyeRX < rightBound) {
-                   xPositions = true;
-               }
+                if (eyeRX > leftBound && eyeRX < rightBound) {
+                    xPositions = true;
+                }
             }
 
             //check if the y values for the left and right eye are within the
@@ -177,7 +177,7 @@ export const initWebgazer = window => {
             //if the x and y values for both the left and right eye are within
             //the validation box then the box border turns green, otherwise if
             //the eyes are outside of the box the colour is red
-            if (xPositions && yPositions){
+            if (xPositions && yPositions) {
                 faceFeedbackBox.style.border = 'solid green';
             } else {
                 faceFeedbackBox.style.border = 'solid red';
@@ -190,8 +190,8 @@ export const initWebgazer = window => {
     /**
     * Alerts the user of the cursor position, used for debugging & testing
     */
-    function checkCursor(){ //used to test
-      alert("Cursor at: " + cursorX + ", " + cursorY);
+    function checkCursor() { //used to test
+        alert("Cursor at: " + cursorX + ", " + cursorY);
     }
 
     /**
@@ -200,7 +200,7 @@ export const initWebgazer = window => {
     * @param {x} x - The x co-ordinate of the desired point to plot
     * @param {y} y - The y co-ordinate of the desired point to plot
     */
-    function drawCoordinates(colour,x,y){
+    function drawCoordinates(colour, x, y) {
         var ctx = document.getElementById("plotting_canvas").getContext('2d');
         ctx.fillStyle = colour; // Red color
         ctx.beginPath();
@@ -221,7 +221,7 @@ export const initWebgazer = window => {
         }
         try {
             return blinkDetector.detectBlink(curTracker.getEyePatches(canvas, width, height));
-        } catch(err) {
+        } catch (err) {
             console.log(err);
             return null;
         }
@@ -263,16 +263,16 @@ export const initWebgazer = window => {
         }
         if (regModelIndex !== undefined) {
             return predictions[regModelIndex] === null ? null : {
-                'x' : predictions[regModelIndex].x,
-                'y' : predictions[regModelIndex].y,
+                'x': predictions[regModelIndex].x,
+                'y': predictions[regModelIndex].y,
                 'eyeFeatures': latestEyeFeatures
             };
         } else {
             return predictions.length === 0 || predictions[0] === null ? null : {
-                'x' : predictions[0].x,
-                'y' : predictions[0].y,
+                'x': predictions[0].x,
+                'y': predictions[0].y,
                 'eyeFeatures': latestEyeFeatures,
-                'all' : predictions
+                'all': predictions
             };
         }
     }
@@ -300,23 +300,22 @@ export const initWebgazer = window => {
             callback(latestGazeData, elapsedTime);
 
             // Draw face overlay
-            if( webgazer.params.showFaceOverlay )
-            {
+            if (webgazer.params.showFaceOverlay) {
                 // Draw the face overlay
-                faceOverlay.getContext('2d').clearRect( 0, 0, videoElement.videoWidth, videoElement.videoHeight);
+                faceOverlay.getContext('2d').clearRect(0, 0, videoElement.videoWidth, videoElement.videoHeight);
                 var cl = webgazer.getTracker().clm;
-                if( cl.getCurrentPosition() ) {
+                if (cl.getCurrentPosition()) {
                     cl.draw(faceOverlay);
                 }
             }
 
             // Feedback box
             // Check that the eyes are inside of the validation box
-            if( webgazer.params.showFaceFeedbackBox )
+            if (webgazer.params.showFaceFeedbackBox)
                 checkEyesInValidationBox();
 
 
-            if( latestGazeData ) {
+            if (latestGazeData) {
 
                 smoothingVals.push(latestGazeData);
                 var x = 0;
@@ -326,10 +325,10 @@ export const initWebgazer = window => {
                     x += smoothingVals.get(d).x;
                     y += smoothingVals.get(d).y;
                 }
-                var pred = webgazer.util.bound({'x':x/len, 'y':y/len});
+                var pred = webgazer.util.bound({ 'x': x / len, 'y': y / len });
 
                 if (store_points_var) {
-                    drawCoordinates('blue',pred.x,pred.y); //draws the previous predictions
+                    drawCoordinates('blue', pred.x, pred.y); //draws the previous predictions
                     //store the position of the past fifty occuring tracker preditions
                     store_points(pred.x, pred.y, k);
                     k++;
@@ -353,7 +352,7 @@ export const initWebgazer = window => {
      * @param {String} eventType - The event type to store
      * @returns {null}
      */
-    var recordScreenPosition = function(x, y, eventType) {
+    var recordScreenPosition = function (x, y, eventType) {
         if (paused) {
             return;
         }
@@ -362,7 +361,7 @@ export const initWebgazer = window => {
             return null;
         }
         for (var reg in regs) {
-            if( latestEyeFeatures )
+            if (latestEyeFeatures)
                 regs[reg].addData(latestEyeFeatures, [x, y], eventType);
         }
     };
@@ -371,7 +370,7 @@ export const initWebgazer = window => {
      * Records click data and passes it to the regression model
      * @param {Event} event - The listened event
      */
-    var clickListener = function(event) {
+    var clickListener = function (event) {
         recordScreenPosition(event.clientX, event.clientY, eventTypes[0]); // eventType[0] === 'click'
     };
 
@@ -379,7 +378,7 @@ export const initWebgazer = window => {
      * Records mouse movement data and passes it to the regression model
      * @param {Event} event - The listened event
      */
-    var moveListener = function(event) {
+    var moveListener = function (event) {
         if (paused) {
             return;
         }
@@ -396,7 +395,7 @@ export const initWebgazer = window => {
     /**
      * Add event listeners for mouse click and move.
      */
-    var addMouseEventListeners = function() {
+    var addMouseEventListeners = function () {
         //third argument set to true so that we get event on 'capture' instead of 'bubbling'
         //this prevents a client using event.stopPropagation() preventing our access to the click
         document.addEventListener('click', clickListener, true);
@@ -406,7 +405,7 @@ export const initWebgazer = window => {
     /**
      * Remove event listeners for mouse click and move.
      */
-    var removeMouseEventListeners = function() {
+    var removeMouseEventListeners = function () {
         // must set third argument to same value used in addMouseEventListeners
         // for this to work.
         document.removeEventListener('click', clickListener, true);
@@ -425,9 +424,9 @@ export const initWebgazer = window => {
         }
     }
 
-   /**
-    * Constructs the global storage object and adds it to local storage
-    */
+    /**
+     * Constructs the global storage object and adds it to local storage
+     */
     function setGlobalData() {
         var storage = {
             'settings': settings,
@@ -502,7 +501,7 @@ export const initWebgazer = window => {
         gazeDot.style.position = 'fixed';
         gazeDot.style.zIndex = 99999;
         gazeDot.style.left = '-5px'; //'-999em';
-        gazeDot.style.top  = '-5px';
+        gazeDot.style.top = '-5px';
         gazeDot.style.background = 'red';
         gazeDot.style.borderRadius = '100%';
         gazeDot.style.opacity = '0.7';
@@ -515,8 +514,8 @@ export const initWebgazer = window => {
         function setupPreviewVideo(e) {
 
             // All video preview parts have now been added, so set the size both internally and in the preview window.
-            setInternalVideoBufferSizes( videoElement.videoWidth, videoElement.videoHeight );
-            webgazer.setVideoViewerSize( webgazer.params.videoViewerWidth, webgazer.params.videoViewerHeight );
+            setInternalVideoBufferSizes(videoElement.videoWidth, videoElement.videoHeight);
+            webgazer.setVideoViewerSize(webgazer.params.videoViewerWidth, webgazer.params.videoViewerHeight);
 
             document.body.appendChild(videoElementCanvas);
             document.body.appendChild(faceOverlay);
@@ -542,29 +541,29 @@ export const initWebgazer = window => {
      * Initializes navigator.mediaDevices.getUserMedia
      * depending on the browser capabilities
      */
-    function setUserMediaVariable(){
+    function setUserMediaVariable() {
 
-      if (navigator.mediaDevices === undefined) {
-        navigator.mediaDevices = {};
-      }
-
-      if (navigator.mediaDevices.getUserMedia === undefined) {
-        navigator.mediaDevices.getUserMedia = function(constraints) {
-
-          // gets the alternative old getUserMedia is possible
-          var getUserMedia = navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
-
-          // set an error message if browser doesn't support getUserMedia
-          if (!getUserMedia) {
-            return Promise.reject(new Error("Unfortunately, your browser does not support access to the webcam through the getUserMedia API. Try to use the latest version of Google Chrome, Mozilla Firefox, Opera, or Microsoft Edge instead."));
-          }
-
-          // uses navigator.getUserMedia for older browsers
-          return new Promise(function(resolve, reject) {
-            getUserMedia.call(navigator, constraints, resolve, reject);
-          });
+        if (navigator.mediaDevices === undefined) {
+            navigator.mediaDevices = {};
         }
-      }
+
+        if (navigator.mediaDevices.getUserMedia === undefined) {
+            navigator.mediaDevices.getUserMedia = function (constraints) {
+
+                // gets the alternative old getUserMedia is possible
+                var getUserMedia = navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+
+                // set an error message if browser doesn't support getUserMedia
+                if (!getUserMedia) {
+                    return Promise.reject(new Error("Unfortunately, your browser does not support access to the webcam through the getUserMedia API. Try to use the latest version of Google Chrome, Mozilla Firefox, Opera, or Microsoft Edge instead."));
+                }
+
+                // uses navigator.getUserMedia for older browsers
+                return new Promise(function (resolve, reject) {
+                    getUserMedia.call(navigator, constraints, resolve, reject);
+                });
+            }
+        }
     }
 
     //PUBLIC FUNCTIONS - CONTROL
@@ -575,14 +574,14 @@ export const initWebgazer = window => {
      * @param {Function} onFail - Callback to call in case it is impossible to find user camera
      * @returns {*}
      */
-    webgazer.begin = function(onFail) {
-        if (window.location.protocol !== 'https:' && window.location.hostname !== 'localhost' && window.chrome){
+    webgazer.begin = function (onFail) {
+        if (window.location.protocol !== 'https:' && window.location.hostname !== 'localhost' && window.chrome) {
             alert("WebGazer works only over https. If you are doing local development you need to run a local server.");
         }
 
         loadGlobalData();
 
-        onFail = onFail || function() {console.log('No stream')};
+        onFail = onFail || function () { console.log('No stream') };
 
         if (debugVideoLoc) {
             init(debugVideoLoc);
@@ -596,17 +595,17 @@ export const initWebgazer = window => {
 
         // Request webcam access under specific constraints
         // WAIT for access
-        navigator.mediaDevices.getUserMedia( webgazer.params.camConstraints )
-        .then(function(stream){ // set the stream
-          videoStream = stream;
-          init(videoStream);
-        })
-        .catch(function(err) { // error handling
-          onFail();
-          console.log( err );
-          videoElement = null;
-          videoStream = null;
-        });
+        navigator.mediaDevices.getUserMedia(webgazer.params.camConstraints)
+            .then(function (stream) { // set the stream
+                videoStream = stream;
+                init(videoStream);
+            })
+            .catch(function (err) { // error handling
+                onFail();
+                console.log(err);
+                videoElement = null;
+                videoStream = null;
+            });
 
         return webgazer;
     };
@@ -617,7 +616,7 @@ export const initWebgazer = window => {
      * [20180729 JT] This seems like a bad idea for how this function should be implemented.
      * @returns {boolean} if webgazer is ready
      */
-    webgazer.isReady = function() {
+    webgazer.isReady = function () {
         if (videoElementCanvas === null) {
             return false;
         }
@@ -628,7 +627,7 @@ export const initWebgazer = window => {
      * Stops collection of data and predictions
      * @returns {webgazer} this
      */
-    webgazer.pause = function() {
+    webgazer.pause = function () {
         paused = true;
         return webgazer;
     };
@@ -637,7 +636,7 @@ export const initWebgazer = window => {
      * Resumes collection of data and predictions if paused
      * @returns {webgazer} this
      */
-    webgazer.resume = function() {
+    webgazer.resume = function () {
         if (!paused) {
             return webgazer;
         }
@@ -650,7 +649,7 @@ export const initWebgazer = window => {
      * stops collection of data and removes dom modifications, must call begin() to reset up
      * @return {webgazer} this
      */
-    webgazer.end = function() {
+    webgazer.end = function () {
         //loop may run an extra time and fail due to removed elements
         paused = true;
 
@@ -668,17 +667,17 @@ export const initWebgazer = window => {
     * Stops the video camera from streaming and removes the video outlines
     * @return {webgazer} this
     */
-    webgazer.stopVideo = function() {
-      // Stops the video from streaming
-      videoStream.getTracks()[0].stop();
+    webgazer.stopVideo = function () {
+        // Stops the video from streaming
+        videoStream.getTracks()[0].stop();
 
-      // Removes the outline of the face
-      document.body.removeChild( faceOverlay );
+        // Removes the outline of the face
+        document.body.removeChild(faceOverlay);
 
-      // Removes the box around the face
-      document.body.removeChild( faceFeedbackBox );
+        // Removes the box around the face
+        document.body.removeChild(faceFeedbackBox);
 
-      return webgazer;
+        return webgazer;
     }
 
 
@@ -688,14 +687,14 @@ export const initWebgazer = window => {
      * Returns if the browser is compatible with webgazer
      * @return {boolean} if browser is compatible
      */
-    webgazer.detectCompatibility = function() {
+    webgazer.detectCompatibility = function () {
 
-      var getUserMedia = navigator.mediaDevices.getUserMedia ||
-        navigator.getUserMedia ||
-        navigator.webkitGetUserMedia ||
-        navigator.mozGetUserMedia;
+        var getUserMedia = navigator.mediaDevices.getUserMedia ||
+            navigator.getUserMedia ||
+            navigator.webkitGetUserMedia ||
+            navigator.mozGetUserMedia;
 
-      return getUserMedia !== undefined;
+        return getUserMedia !== undefined;
     };
 
     /**
@@ -703,9 +702,9 @@ export const initWebgazer = window => {
      * @param {*} bool
      * @return {webgazer} this
      */
-    webgazer.showVideo = function(val) {
+    webgazer.showVideo = function (val) {
         webgazer.params.showVideo = val;
-        if( videoElement) {
+        if (videoElement) {
             videoElement.style.display = val ? 'block' : 'none';
         }
         return webgazer;
@@ -716,9 +715,9 @@ export const initWebgazer = window => {
      * @param {*} bool
      * @return {webgazer} this
      */
-    webgazer.showFaceOverlay = function(val) {
+    webgazer.showFaceOverlay = function (val) {
         webgazer.params.showFaceOverlay = val;
-        if( faceOverlay ) {
+        if (faceOverlay) {
             faceOverlay.style.display = val ? 'block' : 'none';
         }
         return webgazer;
@@ -729,10 +728,10 @@ export const initWebgazer = window => {
      * @param {*} bool
      * @return {webgazer} this
      */
-    webgazer.showFaceFeedbackBox = function(val) {
+    webgazer.showFaceFeedbackBox = function (val) {
 
         webgazer.params.showFaceFeedbackBox = val;
-        if( faceFeedbackBox ) {
+        if (faceFeedbackBox) {
             faceFeedbackBox.style.display = val ? 'block' : 'none';
         }
         return webgazer;
@@ -742,9 +741,9 @@ export const initWebgazer = window => {
      * Set whether the gaze prediction point(s) are visible or not. Multiple because of a trail of past dots.
      * @return {webgazer} this
      */
-    webgazer.showPredictionPoints = function(val) {
+    webgazer.showPredictionPoints = function (val) {
         webgazer.params.showGazeDot = val;
-        if( gazeDot ) {
+        if (gazeDot) {
             gazeDot.style.display = val ? 'block' : 'none';
         }
         return webgazer;
@@ -763,26 +762,25 @@ export const initWebgazer = window => {
      * Note: The constraints set here are applied to the video track only. They also _replace_ any constraints, so be sure to set everything you need.
      * Warning: Setting a large video resolution will decrease performance, and may require
      */
-    webgazer.setCameraConstraints = function(constraints) {
+    webgazer.setCameraConstraints = function (constraints) {
         webgazer.params.camConstraints = constraints;
 
         // If the camera stream is already up...
-        if(videoStream)
-        {
+        if (videoStream) {
             webgazer.pause();
             videoTrack = videoStream.getVideoTracks()[0];
-            videoTrack.applyConstraints( webgazer.params.camConstraints ).then(function() {
+            videoTrack.applyConstraints(webgazer.params.camConstraints).then(function () {
 
                 // Now get what was actually set, and update the internal buffer values
                 videoSettings = videoTrack.getSettings();
-                setInternalVideoBufferSizes( videoSettings.width, videoSettings.height );
+                setInternalVideoBufferSizes(videoSettings.width, videoSettings.height);
 
-            }).catch(function(err) { // error handling
-                console.log( err );
-            }).finally(function() {
+            }).catch(function (err) { // error handling
+                console.log(err);
+            }).finally(function () {
                 // Reset and recompute sizes of the video viewer.
                 // This is only to adjust the feedback box, say, if the aspect ratio of the video has changed.
-                webgazer.setVideoViewerSize( webgazer.params.videoViewerWidth, webgazer.params.videoViewerHeight )
+                webgazer.setVideoViewerSize(webgazer.params.videoViewerWidth, webgazer.params.videoViewerHeight)
                 webgazer.getTracker().reset();
                 webgazer.resume();
             });
@@ -794,17 +792,15 @@ export const initWebgazer = window => {
      * @param {*} width
      * @param {*} height
      */
-    function setInternalVideoBufferSizes( width, height ) {
+    function setInternalVideoBufferSizes(width, height) {
         // Re-set the canvas size used by the internal processes
-        if( videoElementCanvas )
-        {
+        if (videoElementCanvas) {
             videoElementCanvas.width = width;
             videoElementCanvas.height = height;
         }
 
         // Re-set the face overlay canvas size
-        if( faceOverlay )
-        {
+        if (faceOverlay) {
             faceOverlay.width = width;
             faceOverlay.height = height;
         }
@@ -815,15 +811,15 @@ export const initWebgazer = window => {
      *  @param {String} videoLoc - video file location
      *  @return {webgazer} this
      */
-    webgazer.setStaticVideo = function(videoLoc) {
-       debugVideoLoc = videoLoc;
-       return webgazer;
+    webgazer.setStaticVideo = function (videoLoc) {
+        debugVideoLoc = videoLoc;
+        return webgazer;
     };
 
     /**
      * Set the size of the video viewer
      */
-    webgazer.setVideoViewerSize = function(w, h) {
+    webgazer.setVideoViewerSize = function (w, h) {
         webgazer.params.videoViewerWidth = w;
         webgazer.params.videoViewerHeight = h;
 
@@ -849,7 +845,7 @@ export const initWebgazer = window => {
      *  Add the mouse click and move listeners that add training data.
      *  @return {webgazer} this
      */
-    webgazer.addMouseEventListeners = function() {
+    webgazer.addMouseEventListeners = function () {
         addMouseEventListeners();
         return webgazer;
     };
@@ -858,7 +854,7 @@ export const initWebgazer = window => {
      *  Remove the mouse click and move listeners that add training data.
      *  @return {webgazer} this
      */
-    webgazer.removeMouseEventListeners = function() {
+    webgazer.removeMouseEventListeners = function () {
         removeMouseEventListeners();
         return webgazer;
     };
@@ -869,7 +865,7 @@ export const initWebgazer = window => {
      *  @param {String} y - position on screen in the y axis
      *  @return {webgazer} this
      */
-    webgazer.recordScreenPosition = function(x, y) {
+    webgazer.recordScreenPosition = function (x, y) {
         // give this the same weight that a click gets.
         recordScreenPosition(x, y, eventTypes[0]);
         return webgazer;
@@ -882,7 +878,7 @@ export const initWebgazer = window => {
      *  @param {String} eventType - "click" or "move", as per eventTypes
      *  @return {webgazer} this
      */
-    webgazer.recordScreenPosition = function(x, y, eventType) {
+    webgazer.recordScreenPosition = function (x, y, eventType) {
         // give this the same weight that a click gets.
         recordScreenPosition(x, y, eventType);
         return webgazer;
@@ -894,7 +890,7 @@ export const initWebgazer = window => {
      * @param {String} name - The name of the tracking module to use
      * @return {webgazer} this
      */
-    webgazer.setTracker = function(name) {
+    webgazer.setTracker = function (name) {
         if (curTrackerMap[name] === undefined) {
             console.log('Invalid tracker selection');
             console.log('Options are: ');
@@ -912,7 +908,7 @@ export const initWebgazer = window => {
      * @param {String} name - The name of the regression module to use
      * @return {webgazer} this
      */
-    webgazer.setRegression = function(name) {
+    webgazer.setRegression = function (name) {
         if (regressionMap[name] === undefined) {
             console.log('Invalid regression selection');
             console.log('Options are: ');
@@ -933,8 +929,8 @@ export const initWebgazer = window => {
      * @param {Function} constructor - the constructor of the curTracker object
      * @return {webgazer} this
      */
-    webgazer.addTrackerModule = function(name, constructor) {
-        curTrackerMap[name] = function() {
+    webgazer.addTrackerModule = function (name, constructor) {
+        curTrackerMap[name] = function () {
             return new constructor();
         };
     };
@@ -944,8 +940,8 @@ export const initWebgazer = window => {
      * @param {String} name - the new name of the regression
      * @param {Function} constructor - the constructor of the regression object
      */
-    webgazer.addRegressionModule = function(name, constructor) {
-        regressionMap[name] = function() {
+    webgazer.addRegressionModule = function (name, constructor) {
+        regressionMap[name] = function () {
             return new constructor();
         };
     };
@@ -955,7 +951,7 @@ export const initWebgazer = window => {
      * @param {String} name - the string name of the regression module to add
      * @return {webgazer} this
      */
-    webgazer.addRegression = function(name) {
+    webgazer.addRegression = function (name) {
         var newReg = regressionMap[name]();
         data = regs[0].getData();
         newReg.setData(data);
@@ -968,7 +964,7 @@ export const initWebgazer = window => {
      * @param {function} listener - The callback function to call (it must be like function(data, elapsedTime))
      * @return {webgazer} this
      */
-    webgazer.setGazeListener = function(listener) {
+    webgazer.setGazeListener = function (listener) {
         callback = listener;
         return webgazer;
     };
@@ -977,7 +973,7 @@ export const initWebgazer = window => {
      * Removes the callback set by setGazeListener
      * @return {webgazer} this
      */
-    webgazer.clearGazeListener = function() {
+    webgazer.clearGazeListener = function () {
         callback = nopCallback;
         return webgazer;
     };
@@ -988,7 +984,7 @@ export const initWebgazer = window => {
      * Returns the tracker currently in use
      * @return {tracker} an object following the tracker interface
      */
-    webgazer.getTracker = function() {
+    webgazer.getTracker = function () {
         return curTracker;
     };
 
@@ -996,7 +992,7 @@ export const initWebgazer = window => {
      * Returns the regression currently in use
      * @return {Array.<Object>} an array of regression objects following the regression interface
      */
-    webgazer.getRegression = function() {
+    webgazer.getRegression = function () {
         return regs;
     };
 
@@ -1004,7 +1000,7 @@ export const initWebgazer = window => {
      * Requests an immediate prediction
      * @return {object} prediction data object
      */
-    webgazer.getCurrentPrediction = function() {
+    webgazer.getCurrentPrediction = function () {
         return getPrediction();
     };
 
@@ -1012,7 +1008,7 @@ export const initWebgazer = window => {
      * returns the different event types that may be passed to regressions when calling regression.addData()
      * @return {Array} array of strings where each string is an event type
      */
-    webgazer.params.getEventTypes = function() {
+    webgazer.params.getEventTypes = function () {
         return eventTypes.slice();
     }
 
@@ -1020,7 +1016,7 @@ export const initWebgazer = window => {
      * Get the video element canvas that WebGazer uses internally on which to run its face tracker.
      * @return The current video element canvas
      */
-    webgazer.getVideoElementCanvas = function() {
+    webgazer.getVideoElementCanvas = function () {
         return videoElementCanvas;
     }
 
@@ -1028,12 +1024,37 @@ export const initWebgazer = window => {
      * Set the video element canvas; useful if you want to run WebGazer on your own canvas (e.g., on any random image).
      * @return The current video element canvas
      */
-    webgazer.setVideoElementCanvas = function(canvas) {
+    webgazer.setVideoElementCanvas = function (canvas) {
         videoElementCanvas = canvas;
     }
 
-    webgazer.getVideoPreviewToCameraResolutionRatio = function() {
+    webgazer.getVideoPreviewToCameraResolutionRatio = function () {
         return [webgazer.params.videoViewerWidth / videoElement.videoWidth, webgazer.params.videoViewerHeight / videoElement.videoHeight];
+    }
+
+    //
+    // CUSTOM METHODS
+    //
+
+    /**
+     * Access latestEyeFeatures from outside
+     */
+    webgazer.getLatestEyeFeatures = function () {
+        return latestEyeFeatures;
+    }
+
+    /**
+     * Add eyeFeatures manually
+     */
+    webgazer.addEyeFeatures = function (eyeFeatures, x, y, eventType = 'click') {
+        if (regs.length === 0) {
+            console.log('regression not set, call setRegression()');
+            return null;
+        }
+
+        for (var reg in regs) {
+            regs[reg].addData(eyeFeatures, [x, y], eventType);
+        }
     }
 
 }; //(window));
