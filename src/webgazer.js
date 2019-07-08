@@ -39,7 +39,7 @@ export const initWebgazer = window => {
   webgazer.params.showGazeDot = false;
 
   //Params to clmtrackr and getUserMedia constraints
-  webgazer.params.clmParams = webgazer.params.clmParams || { useWebGL: true };
+  webgazer.params.clmParams = webgazer.params.clmParams || { useWebGL: false };
   webgazer.params.camConstraints = webgazer.params.camConstraints || { video: { width: { min: 320, ideal: 640, max: 1920 }, height: { min: 240, ideal: 480, max: 1080 }, facingMode: "user" } };
 
   webgazer.params.smoothEyeBB = webgazer.params.smoothEyeBB || false;
@@ -94,6 +94,8 @@ export const initWebgazer = window => {
     'settings': {}
   };
 
+  // We will overwrite this method on mobile
+  webgazer.currentFramePainter = paintCurrentFrame;
 
   //PRIVATE FUNCTIONS
 
@@ -103,10 +105,11 @@ export const initWebgazer = window => {
    */
   webgazer.computeValidationBoxSize = function () {
 
-    var vw = videoElement.videoWidth;
-    var vh = videoElement.videoHeight;
-    var pw = parseInt(videoElement.style.width);
-    var ph = parseInt(videoElement.style.height);
+    var vw =  videoElement ? videoElement.videoWidth : videoElementCanvas.width;
+    var vh =  videoElement ? videoElement.videoHeight : videoElementCanvas.height;
+
+    var pw = videoElement ? parseInt(videoElement.style.width) : videoElementCanvas.width;
+    var ph = videoElement ? parseInt(videoElement.style.height) : videoElementCanvas.height;
 
     // Find the size of the box.
     // Pick the smaller of the two video preview sizes
@@ -234,15 +237,17 @@ export const initWebgazer = window => {
    * @param {Number} height - the new height of the canvas
    */
   function paintCurrentFrame(canvas, width, height) {
-    if (canvas.width != width) {
-      canvas.width = width;
-    }
-    if (canvas.height != height) {
-      canvas.height = height;
-    }
+    if (videoElement) {
+      if (canvas.width != width) {
+        canvas.width = width;
+      }
+      if (canvas.height != height) {
+        canvas.height = height;
+      }
 
-    var ctx = canvas.getContext('2d');
-    ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+      var ctx = canvas.getContext('2d');
+      ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+    }
   }
 
   /**
@@ -284,13 +289,12 @@ export const initWebgazer = window => {
   var k = 0;
 
   function loop() {
-
     if (!paused) {
 
       // Paint the latest video frame into the canvas which will be analyzed by WebGazer
       // [20180729 JT] Why do we need to do this? clmTracker does this itself _already_, which is just duplicating the work.
       // Is it because other trackers need a canvas instead of an img/video element?
-      paintCurrentFrame(videoElementCanvas, videoElementCanvas.width, videoElementCanvas.height);
+      webgazer.currentFramePainter(videoElementCanvas, videoElementCanvas.width, videoElementCanvas.height);
 
       // Get gaze prediction (ask clm to track; pass the data to the regressor; get back a prediction)
       latestGazeData = getPrediction();
@@ -302,7 +306,9 @@ export const initWebgazer = window => {
       // Draw face overlay
       if (webgazer.params.showFaceOverlay) {
         // Draw the face overlay
-        faceOverlay.getContext('2d').clearRect(0, 0, videoElement.videoWidth, videoElement.videoHeight);
+        // faceOverlay.getContext('2d').clearRect(0, 0, videoElement.videoWidth, videoElement.videoHeight);
+        faceOverlay.getContext('2d').clearRect(0, 0, videoElementCanvas.width, videoElementCanvas.height);
+
         var cl = webgazer.getTracker().clm;
         if (cl.getCurrentPosition()) {
           cl.draw(faceOverlay);
@@ -311,9 +317,9 @@ export const initWebgazer = window => {
 
       // Feedback box
       // Check that the eyes are inside of the validation box
-      if (webgazer.params.showFaceFeedbackBox)
+      if (webgazer.params.showFaceFeedbackBox) {
         checkEyesInValidationBox();
-
+      }
 
       if (latestGazeData) {
 
@@ -458,18 +464,20 @@ export const initWebgazer = window => {
     var topDist = '0px'
     var leftDist = '0px'
 
-    videoElement = document.createElement('video');
-    videoElement.id = webgazer.params.videoElementId;
-    videoElement.srcObject = videoStream;
-    videoElement.autoplay = true;
-    videoElement.style.display = webgazer.params.showVideo ? 'block' : 'none';
-    videoElement.style.position = 'fixed';
-    videoElement.style.top = topDist;
-    videoElement.style.left = leftDist;
-    // We set these to stop the video appearing too large when it is added for the very first time
-    videoElement.style.width = webgazer.params.videoViewerWidth + 'px';
-    videoElement.style.height = webgazer.params.videoViewerHeight + 'px';
-    //videoElement.style.zIndex="-1";
+    if (videoStream) {
+      videoElement = document.createElement('video');
+      videoElement.id = webgazer.params.videoElementId;
+      videoElement.srcObject = videoStream;
+      videoElement.autoplay = true;
+      videoElement.style.display = webgazer.params.showVideo ? 'block' : 'none';
+      videoElement.style.position = 'fixed';
+      videoElement.style.top = topDist;
+      videoElement.style.left = leftDist;
+      // We set these to stop the video appearing too large when it is added for the very first time
+      videoElement.style.width = webgazer.params.videoViewerWidth + 'px';
+      videoElement.style.height = webgazer.params.videoViewerHeight + 'px';
+      //videoElement.style.zIndex="-1";
+    }
 
     // Canvas for drawing video to pass to clm tracker
     videoElementCanvas = document.createElement('canvas');
@@ -510,31 +518,38 @@ export const initWebgazer = window => {
 
 
     // Add other preview/feedback elements to the screen once the video has shown and its parameters are initialized
-    document.body.appendChild(videoElement);
-    function setupPreviewVideo(e) {
+    if (videoStream) {
+      document.body.appendChild(videoElement);
 
-      // All video preview parts have now been added, so set the size both internally and in the preview window.
-      setInternalVideoBufferSizes(videoElement.videoWidth, videoElement.videoHeight);
-      webgazer.setVideoViewerSize(webgazer.params.videoViewerWidth, webgazer.params.videoViewerHeight);
+      function setupPreviewVideo(e) {
+        webgazer.setupPreviewVideo(videoElement.videoWidth, videoElement.videoHeight);
 
-      document.body.appendChild(videoElementCanvas);
-      document.body.appendChild(faceOverlay);
-      document.body.appendChild(faceFeedbackBox);
-      document.body.appendChild(gazeDot);
+        // Run this only once, so remove the event listener
+        e.target.removeEventListener(e.type, setupPreviewVideo);
+      };
+      videoElement.addEventListener('timeupdate', setupPreviewVideo);
+    }
 
-      // Run this only once, so remove the event listener
-      e.target.removeEventListener(e.type, setupPreviewVideo);
-    };
-    videoElement.addEventListener('timeupdate', setupPreviewVideo);
-
-
-    addMouseEventListeners();
+    // addMouseEventListeners();
 
     //BEGIN CALLBACK LOOP
     paused = false;
     clockStart = performance.now();
 
     loop();
+  }
+
+  // Used by client & mobile
+  webgazer.setupPreviewVideo = function(w, h) {
+    // All video preview parts have now been added, so set the size both internally and in the preview window.
+    setInternalVideoBufferSizes(w, h);
+
+    webgazer.setVideoViewerSize(webgazer.params.videoViewerWidth, webgazer.params.videoViewerHeight);
+
+    if (videoElementCanvas) document.body.appendChild(videoElementCanvas);
+    if (faceOverlay) document.body.appendChild(faceOverlay);
+    if (faceFeedbackBox) document.body.appendChild(faceFeedbackBox);
+    if (gazeDot) document.body.appendChild(gazeDot);
   }
 
   /**
@@ -574,41 +589,45 @@ export const initWebgazer = window => {
    * @param {Function} onFail - Callback to call in case it is impossible to find user camera
    * @returns {*}
    */
-  webgazer.begin = function (onFail) {
+  webgazer.begin = function (useCustomVideoElement) {
     if (window.location.protocol !== 'https:' && window.location.hostname !== 'localhost' && window.chrome) {
-      alert("WebGazer works only over https. If you are doing local development you need to run a local server.");
+        alert("WebGazer works only over https. If you are doing local development you need to run a local server.");
     }
 
     loadGlobalData();
 
-    onFail = onFail || function () { console.log('No stream') };
-
     if (debugVideoLoc) {
-      init(debugVideoLoc);
-      return webgazer;
+        init(debugVideoLoc);
+        return webgazer;
     }
-
-    ///////////////////////
-    // SETUP VIDEO ELEMENTS
-    // Sets .mediaDevices.getUserMedia depending on browser
-    setUserMediaVariable();
 
     // Request webcam access under specific constraints
     // WAIT for access
-    navigator.mediaDevices.getUserMedia(webgazer.params.camConstraints)
-      .then(function (stream) { // set the stream
-        videoStream = stream;
-        init(videoStream);
-      })
-      .catch(function (err) { // error handling
-        onFail();
-        console.log(err);
-        videoElement = null;
-        videoStream = null;
-      });
+    if (!useCustomVideoElement) {
+      ///////////////////////
+      // SETUP VIDEO ELEMENTS
+      // Sets .mediaDevices.getUserMedia depending on browser
+      setUserMediaVariable();
+
+      navigator.mediaDevices.getUserMedia(webgazer.params.camConstraints)
+        .then(function (stream) { // set the stream
+          videoStream = stream;
+          init(videoStream);
+        })
+        .catch(function (err) { // error handling
+          console.log('No getMedia stream')
+
+          videoElement = null;
+          videoStream = null;
+        });
+    // Init without videoStream (we use native video)
+    } else {
+      console.log('Use external video source');
+      init(null)
+    }
 
     return webgazer;
-  };
+};
 
 
   /**
@@ -656,7 +675,9 @@ export const initWebgazer = window => {
     //webgazer.stopVideo(); // uncomment if you want to stop the video from streaming
 
     //remove video element and canvas
-    document.body.removeChild(videoElement);
+    if (videoElement) {
+      document.body.removeChild(videoElement);
+    }
     document.body.removeChild(videoElementCanvas);
 
     setGlobalData();
@@ -824,8 +845,10 @@ export const initWebgazer = window => {
     webgazer.params.videoViewerHeight = h;
 
     // Change the video viewer
-    videoElement.style.width = w + 'px';
-    videoElement.style.height = h + 'px';
+    if (videoElement) {
+      videoElement.style.width = w + 'px';
+      videoElement.style.height = h + 'px';
+    }
 
     // Change the face overlay
     faceOverlay.style.width = w + 'px';
@@ -833,12 +856,20 @@ export const initWebgazer = window => {
 
     // Change the feedback box size
     // Compute the boundaries of the face overlay validation box based on the video size
-    var tlwh = webgazer.computeValidationBoxSize()
+    if (videoElement) { // petrot if
+      var tlwh = webgazer.computeValidationBoxSize();
+    } else {
+      // petrot TODO: native platform?
+      var tlwh = [0, 0, 0, 0];
+    }
+
     // Assign them to the object
-    faceFeedbackBox.style.top = tlwh[0] + 'px';
-    faceFeedbackBox.style.left = tlwh[1] + 'px';
-    faceFeedbackBox.style.width = tlwh[2] + 'px';
-    faceFeedbackBox.style.height = tlwh[3] + 'px';
+    if (faceFeedbackBox) {
+      faceFeedbackBox.style.top = tlwh[0] + 'px';
+      faceFeedbackBox.style.left = tlwh[1] + 'px';
+      faceFeedbackBox.style.width = tlwh[2] + 'px';
+      faceFeedbackBox.style.height = tlwh[3] + 'px';
+    }
   };
 
   /**

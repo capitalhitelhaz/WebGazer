@@ -7,7 +7,7 @@ var clm = {
 		if (!params) params = {};
 		if (params.constantVelocity === undefined) params.constantVelocity = true;
 		if (params.searchWindow === undefined) params.searchWindow = 11;
-		if (params.useWebGL === undefined) params.useWebGL = true;
+		if (params.useWebGL === undefined) params.useWebGL = false;
 		if (params.scoreThreshold === undefined) params.scoreThreshold = 0.5;
 		if (params.stopOnConvergence === undefined) params.stopOnConvergence = false;
 		if (params.weightPoints === undefined) params.weightPoints = undefined;
