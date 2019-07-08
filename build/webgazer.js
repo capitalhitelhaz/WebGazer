@@ -10525,7 +10525,6 @@ export const initWebgazer = window => {
    * @returns {Object} The dimensions of the validation box as top, left, width, height.
    */
   webgazer.computeValidationBoxSize = function () {
-
     var vw =  videoElement ? videoElement.videoWidth : videoElementCanvas.width;
     var vh =  videoElement ? videoElement.videoHeight : videoElementCanvas.height;
 
@@ -11277,12 +11276,7 @@ export const initWebgazer = window => {
 
     // Change the feedback box size
     // Compute the boundaries of the face overlay validation box based on the video size
-    if (videoElement) { // petrot if
-      var tlwh = webgazer.computeValidationBoxSize();
-    } else {
-      // petrot TODO: native platform?
-      var tlwh = [0, 0, 0, 0];
-    }
+    var tlwh = webgazer.computeValidationBoxSize();
 
     // Assign them to the object
     if (faceFeedbackBox) {
