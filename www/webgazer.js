@@ -4732,7 +4732,7 @@ var clm = {
 		if (!params) params = {};
 		if (params.constantVelocity === undefined) params.constantVelocity = true;
 		if (params.searchWindow === undefined) params.searchWindow = 11;
-		if (params.useWebGL === undefined) params.useWebGL = true;
+		if (params.useWebGL === undefined) params.useWebGL = false;
 		if (params.scoreThreshold === undefined) params.scoreThreshold = 0.5;
 		if (params.stopOnConvergence === undefined) params.stopOnConvergence = false;
 		if (params.weightPoints === undefined) params.weightPoints = undefined;
@@ -10460,7 +10460,7 @@ export const initWebgazer = window => {
   webgazer.params.showGazeDot = false;
 
   //Params to clmtrackr and getUserMedia constraints
-  webgazer.params.clmParams = webgazer.params.clmParams || { useWebGL: true };
+  webgazer.params.clmParams = webgazer.params.clmParams || { useWebGL: false };
   webgazer.params.camConstraints = webgazer.params.camConstraints || { video: { width: { min: 320, ideal: 640, max: 1920 }, height: { min: 240, ideal: 480, max: 1080 }, facingMode: "user" } };
 
   webgazer.params.smoothEyeBB = webgazer.params.smoothEyeBB || false;
@@ -10526,10 +10526,11 @@ export const initWebgazer = window => {
    */
   webgazer.computeValidationBoxSize = function () {
 
-    var vw = videoElement.videoWidth;
-    var vh = videoElement.videoHeight;
-    var pw = parseInt(videoElement.style.width);
-    var ph = parseInt(videoElement.style.height);
+    var vw =  videoElement ? videoElement.videoWidth : videoElementCanvas.width;
+    var vh =  videoElement ? videoElement.videoHeight : videoElementCanvas.height;
+
+    var pw = videoElement ? parseInt(videoElement.style.width) : videoElementCanvas.width;
+    var ph = videoElement ? parseInt(videoElement.style.height) : videoElementCanvas.height;
 
     // Find the size of the box.
     // Pick the smaller of the two video preview sizes
@@ -11095,7 +11096,9 @@ export const initWebgazer = window => {
     //webgazer.stopVideo(); // uncomment if you want to stop the video from streaming
 
     //remove video element and canvas
-    document.body.removeChild(videoElement);
+    if (videoElement) {
+      document.body.removeChild(videoElement);
+    }
     document.body.removeChild(videoElementCanvas);
 
     setGlobalData();
