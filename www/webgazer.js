@@ -10555,10 +10555,9 @@ export const initWebgazer = window => {
   * // TODO These are all wrong. The latestEyeFeatures will be in 'video' space not 'preview' space, and so need to be converted.
   */
   function checkEyesInValidationBox() {
-
     if (faceFeedbackBox != null && latestEyeFeatures) {
-      var w = videoElement.videoWidth;
-      var h = videoElement.videoHeight;
+      var w = videoElement ? videoElement.videoWidth : videoElementCanvas.width;
+      var h = videoElement ? videoElement.videoHeight : videoElementCanvas.height;
 
       // Find the size of the box.
       // Pick the smaller of the two video preview sizes
@@ -11103,6 +11102,10 @@ export const initWebgazer = window => {
     setGlobalData();
     return webgazer;
   };
+
+  webgazer.clearData = function() {
+    clearData();
+  }
 
   /**
   * Stops the video camera from streaming and removes the video outlines
