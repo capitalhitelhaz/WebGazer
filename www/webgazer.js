@@ -11097,7 +11097,9 @@ export const initWebgazer = window => {
     if (videoElement) {
       document.body.removeChild(videoElement);
     }
-    document.body.removeChild(videoElementCanvas);
+    if (videoElementCanvas) {
+      document.body.removeChild(videoElementCanvas);
+    }
 
     setGlobalData();
     return webgazer;
