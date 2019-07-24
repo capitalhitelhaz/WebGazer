@@ -10601,12 +10601,26 @@ export const initWebgazer = window => {
       //the eyes are outside of the box the colour is red
       if (xPositions && yPositions) {
         faceFeedbackBox.style.border = 'solid green';
+
+        // Create your own callback func inside the parent app
+        if (webgazer.faceFeedbackBoxCallback) {
+          webgazer.faceFeedbackBoxCallback('ok')
+        }
       } else {
         faceFeedbackBox.style.border = 'solid red';
+
+        if (webgazer.faceFeedbackBoxCallback) {
+          webgazer.faceFeedbackBoxCallback('outside')
+        }
       }
     }
-    else
+    else {
       faceFeedbackBox.style.border = 'solid black';
+
+      if (webgazer.faceFeedbackBoxCallback) {
+        webgazer.faceFeedbackBoxCallback('unknown')
+      }
+    }
   }
 
   /**
@@ -10866,7 +10880,10 @@ export const initWebgazer = window => {
    * Clears data from model and global storage
    */
   function clearData() {
-    window.localStorage.set(localstorageLabel, undefined);
+    if (window.localStorage && window.localStorage.set) {
+      window.localStorage.set(localstorageLabel, undefined);
+    }
+
     for (var reg in regs) {
       regs[reg].setData([]);
     }
@@ -11095,10 +11112,12 @@ export const initWebgazer = window => {
 
     //remove video element and canvas
     if (videoElement) {
-      document.body.removeChild(videoElement);
+      // document.body.removeChild(videoElement);
+      videoElement.parentElement.removeChild(videoElement);
     }
     if (videoElementCanvas) {
-      document.body.removeChild(videoElementCanvas);
+      videoElementCanvas.parentElement.removeChild(videoElementCanvas);
+      //document.body.removeChild(videoElementCanvas);
     }
 
     setGlobalData();
@@ -11118,10 +11137,12 @@ export const initWebgazer = window => {
     videoStream.getTracks()[0].stop();
 
     // Removes the outline of the face
-    document.body.removeChild(faceOverlay);
+    // document.body.removeChild(faceOverlay);
+    faceOverlay.parentElement.removeChild(faceOverlay);
 
     // Removes the box around the face
-    document.body.removeChild(faceFeedbackBox);
+    // document.body.removeChild(faceFeedbackBox);
+    faceFeedbackBox.parentElement.removeChild(faceFeedbackBox);
 
     return webgazer;
   }
